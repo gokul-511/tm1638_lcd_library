@@ -39,7 +39,6 @@ extern "C" {
 
 /* Includes ---------------------------------------------------------------------*/
 #include "TM1638.h"
-#include <stdint.h>
 
 
 /* Functionality Options --------------------------------------------------------*/
@@ -51,6 +50,7 @@ extern "C" {
 // #define TM1638_PLATFORM_STM32        // HAL Functions
 // #define TM1638_PLATFORM_STM32_LL     // LL Functions
 // #define TM1638_PLATFORM_ESP32_IDF    // ESP-IDF
+#define TM1638_PLATFORM_8051_NUVOTON
 
 
 #if defined(TM1638_PLATFORM_AVR)
@@ -98,6 +98,21 @@ extern "C" {
 #define TM1638_CLK_GPIO     GPIO_NUM_0
 #define TM1638_DIO_GPIO     GPIO_NUM_1
 #define TM1638_STB_GPIO     GPIO_NUM_2
+    
+#elif defined(TM1638_PLATFORM_8051_NUVOTON)
+#define TM1638_CLK_GPIO P1^5
+#define TM1638_DIO_GPIO P1^6
+#define TM1638_STB_GPIO P1^7
+#define TM1638_CLK_GPIO5 5
+#define TM1638_DIO_GPIO6 6
+#define TM1638_STB_GPIO7 7
+#define TM1638_DIO_GPIO_HIGH    P1|=(1<<6);
+#define TM1638_DIO_GPIO_LOW     P1&=~(1<<6);
+#define TM1638_STB_GPIO_HIGH    P1|=(1<<7);
+#define TM1638_STB_GPIO_LOW    P1&=~(1<<7);
+#define TM1638_CLK_GPIO_HIGH    P1|=(1<<5);
+#define TM1638_CLK_GPIO_LOW    P1&=~(1<<5);
+
 #endif
 
 

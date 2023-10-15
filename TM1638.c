@@ -64,7 +64,7 @@
 /**
  * @brief  Convert HEX number to Seven-Segment code
  */
-const uint8_t HexTo7Seg[40] =
+const unsigned char HexTo7Seg[40] =
 {
   0x3F, // 0
   0x06, // 1
@@ -116,13 +116,13 @@ const uint8_t HexTo7Seg[40] =
  ==================================================================================
  */
 
-static inline void
+void
 TM1638_StartComunication(TM1638_Handler_t *Handler)
 {
   Handler->StbWrite(0);
 }
 
-static inline void
+void
 TM1638_StopComunication(TM1638_Handler_t *Handler)
 {
   Handler->StbWrite(1);
@@ -130,9 +130,9 @@ TM1638_StopComunication(TM1638_Handler_t *Handler)
 
 static void
 TM1638_WriteBytes(TM1638_Handler_t *Handler,
-                  const uint8_t *Data, uint8_t NumOfBytes)
+                  const unsigned char *Data, unsigned char NumOfBytes)
 {
-  uint8_t i, j, Buff;
+  unsigned char i, j, Buff;
 
   Handler->DioConfigOut();
 
@@ -151,9 +151,9 @@ TM1638_WriteBytes(TM1638_Handler_t *Handler,
 
 static void
 TM1638_ReadBytes(TM1638_Handler_t *Handler,
-                 uint8_t *Data, uint8_t NumOfBytes)
+                 unsigned char *Data, unsigned char NumOfBytes)
 {
-  uint8_t i, j, Buff;
+  unsigned char i, j, Buff;
 
   Handler->DioConfigIn();
 
@@ -177,10 +177,10 @@ TM1638_ReadBytes(TM1638_Handler_t *Handler,
 
 static void
 TM1638_SetMultipleDisplayRegister(TM1638_Handler_t *Handler,
-                                  const uint8_t *DigitData,
-                                  uint8_t StartAddr, uint8_t Count)
+                                  const unsigned char *DigitData,
+                                  unsigned char StartAddr, unsigned char Count)
 {
-  uint8_t Data = DataInstructionSet | WriteDataToRegister |
+  unsigned char Data = DataInstructionSet | WriteDataToRegister |
                  AutoAddressAdd | NormalMode;
 
   TM1638_StartComunication(Handler);
@@ -196,9 +196,9 @@ TM1638_SetMultipleDisplayRegister(TM1638_Handler_t *Handler,
 }
 
 static void
-TM1638_ScanKeyRegs(TM1638_Handler_t *Handler, uint8_t *KeyRegs)
+TM1638_ScanKeyRegs(TM1638_Handler_t *Handler, unsigned char *KeyRegs)
 {
-  uint8_t Data = DataInstructionSet | ReadKeyScanData |
+  unsigned char Data = DataInstructionSet | ReadKeyScanData |
                  AutoAddressAdd | NormalMode;
 
   TM1638_StartComunication(Handler);
@@ -228,12 +228,13 @@ TM1638_ScanKeyRegs(TM1638_Handler_t *Handler, uint8_t *KeyRegs)
  *         - TM1638_OK: Operation was successful.
  */
 TM1638_Result_t
-TM1638_Init(TM1638_Handler_t *Handler, uint8_t Type)
+TM1638_Init(TM1638_Handler_t *Handler, unsigned char Type)
 {
+	unsigned char i;
   Handler->DisplayType = TM1638DisplayTypeComCathode;
 
 #if TM1638_SUPPORT_COM_ANODE
-  for (uint8_t i = 0; i < 16; i++)
+  for ( i= 0; i < 16; i++)
   {
     Handler->DisplayRegister[i] = 0;
   }
@@ -290,9 +291,9 @@ TM1638_DeInit(TM1638_Handler_t *Handler)
  */
 TM1638_Result_t
 TM1638_ConfigDisplay(TM1638_Handler_t *Handler,
-                     uint8_t Brightness, uint8_t DisplayState)
+                     unsigned char Brightness, unsigned char DisplayState)
 {
-  uint8_t Data = DisplayControlInstructionSet;
+  unsigned char Data = DisplayControlInstructionSet;
   Data |= Brightness & 0x07;
   Data |= (DisplayState) ? (ShowTurnOn) : (ShowTurnOff);
 
@@ -320,7 +321,7 @@ TM1638_ConfigDisplay(TM1638_Handler_t *Handler,
  */
 TM1638_Result_t
 TM1638_SetSingleDigit(TM1638_Handler_t *Handler,
-                      uint8_t DigitData, uint8_t DigitPos)
+                      unsigned char DigitData, unsigned char DigitPos)
 { 
   if (Handler->DisplayType == TM1638DisplayTypeComCathode)
     TM1638_SetMultipleDisplayRegister(Handler, &DigitData, DigitPos, 1);
@@ -348,12 +349,12 @@ TM1638_SetSingleDigit(TM1638_Handler_t *Handler,
  *         - TM1638_OK: Operation was successful
  */
 TM1638_Result_t
-TM1638_SetMultipleDigit(TM1638_Handler_t *Handler, const uint8_t *DigitData,
-                        uint8_t StartAddr, uint8_t Count)
+TM1638_SetMultipleDigit(TM1638_Handler_t *Handler, const unsigned char *DigitData,
+                        unsigned char StartAddr, unsigned char Count)
 {
-  uint8_t Shift = 0;
-  uint8_t DigitDataBuff = 0;
-  uint8_t i = 0, j = 0;
+  unsigned char Shift = 0;
+  unsigned char DigitDataBuff = 0;
+  unsigned char i = 0, j = 0;
 
   if (Handler->DisplayType == TM1638DisplayTypeComCathode)
     TM1638_SetMultipleDisplayRegister(Handler, DigitData, StartAddr, Count);
@@ -410,10 +411,10 @@ TM1638_SetMultipleDigit(TM1638_Handler_t *Handler, const uint8_t *DigitData,
  */
 TM1638_Result_t
 TM1638_SetSingleDigit_HEX(TM1638_Handler_t *Handler,
-                          uint8_t DigitData, uint8_t DigitPos)
+                          unsigned char DigitData, unsigned char DigitPos)
 {
-  uint8_t DigitDataHEX = 0;
-  uint8_t DecimalPoint = DigitData & 0x80;
+  unsigned char DigitDataHEX = 0;
+  unsigned char DecimalPoint = DigitData & 0x80;
 
   DigitData &= 0x7F;
 
@@ -483,13 +484,13 @@ TM1638_SetSingleDigit_HEX(TM1638_Handler_t *Handler,
  *         - TM1638_OK: Operation was successful
  */
 TM1638_Result_t
-TM1638_SetMultipleDigit_HEX(TM1638_Handler_t *Handler, const uint8_t *DigitData,
-                            uint8_t StartAddr, uint8_t Count)
+TM1638_SetMultipleDigit_HEX(TM1638_Handler_t *Handler, const unsigned char *DigitData,
+                            unsigned char StartAddr, unsigned char Count)
 {
-  uint8_t DigitDataHEX[10];
-  uint8_t DecimalPoint = 0;
-
-  for (uint8_t i = 0; i < Count; i++)
+  unsigned char DigitDataHEX[10];
+  unsigned char DecimalPoint = 0;
+	unsigned char i;
+  for (i = 0; i < Count; i++)
   {
     DecimalPoint = DigitData[i] & 0x80;
 
@@ -539,7 +540,7 @@ TM1638_SetMultipleDigit_HEX(TM1638_Handler_t *Handler, const uint8_t *DigitData,
   }
 
   return TM1638_SetMultipleDigit(Handler,
-                                 (const uint8_t *)DigitDataHEX, StartAddr, Count);
+                                 (const unsigned char *)DigitDataHEX, StartAddr, Count);
 }
 
 
@@ -563,18 +564,19 @@ TM1638_SetMultipleDigit_HEX(TM1638_Handler_t *Handler, const uint8_t *DigitData,
  *         - TM1638_OK: Operation was successful
  */
 TM1638_Result_t
-TM1638_SetMultipleDigit_CHAR(TM1638_Handler_t *Handler, const uint8_t *DigitData,
-                            uint8_t StartAddr, uint8_t Count)
+TM1638_SetMultipleDigit_CHAR(TM1638_Handler_t *Handler, const unsigned char *DigitData,
+                            unsigned char StartAddr, unsigned char Count)
 {
-  uint8_t DigitDataHEX[10];
-  uint8_t DecimalPoint = 0;
+  unsigned char DigitDataHEX[10];
+  unsigned char DecimalPoint = 0;
+	unsigned char i;
 
-  for (uint8_t i = 0; i < Count; i++)
+  for (i = 0; i < Count; i++)
   {
     DecimalPoint = DigitData[i] & 0x80;
 
     // numbers 0 - 9
-    if ((DigitData[i] & 0x7F) >= (uint8_t)'0' && (DigitData[i] & 0x7F) <= (uint8_t)'9')
+    if ((DigitData[i] & 0x7F) >= (unsigned char)'0' && (DigitData[i] & 0x7F) <= (unsigned char)'9')
     {
       DigitDataHEX[i] = HexTo7Seg[(DigitData[i]-48) & 0x7F] | DecimalPoint;
     }
@@ -723,7 +725,7 @@ TM1638_SetMultipleDigit_CHAR(TM1638_Handler_t *Handler, const uint8_t *DigitData
   }
 
   return TM1638_SetMultipleDigit(Handler,
-                                 (const uint8_t *)DigitDataHEX, StartAddr, Count);
+                                 (const unsigned char *)DigitDataHEX, StartAddr, Count);
 }
 
 
@@ -753,26 +755,29 @@ TM1638_SetMultipleDigit_CHAR(TM1638_Handler_t *Handler, const uint8_t *DigitData
  *         - TM1638_OK: Operation was successful
  */
 TM1638_Result_t
-TM1638_ScanKeys(TM1638_Handler_t *Handler, uint32_t *Keys)
+TM1638_ScanKeys(TM1638_Handler_t *Handler, unsigned long *Keys)
+	//check this original function I think there might be errors
+//it had 2 same variable in a nested loops
 {
-  uint8_t KeyRegs[4];
-  uint32_t KeysBuff = 0;
-  uint8_t Kn = 0x01;
-
+  unsigned char KeyRegs[4];
+  unsigned long KeysBuff = 0;
+  unsigned char Kn = 0x01;
+	unsigned char i;
+	unsigned char i1;
   TM1638_ScanKeyRegs(Handler, KeyRegs);
 
-  for (uint8_t i = 0; i < 3; i++)
+  for (i = 0; i < 3; i++)
   {
-    for (int8_t i = 3; i >= 0; i--)
+    for ( i1 = 3; i1 >= 0; i1--)
     {
       KeysBuff <<= 1;
 
-      if (KeyRegs[i] & (Kn << 4))
+      if (KeyRegs[i1] & (Kn << 4))
         KeysBuff |= 1;
 
       KeysBuff <<= 1;
 
-      if (KeyRegs[i] & Kn)
+      if (KeyRegs[i1] & Kn)
         KeysBuff |= 1;
     }
 

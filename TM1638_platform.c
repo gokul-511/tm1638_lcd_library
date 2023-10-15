@@ -30,7 +30,6 @@
   
 /* Includes ---------------------------------------------------------------------*/
 #include "TM1638_platform.h"
-
 #if defined(TM1638_PLATFORM_AVR)
 #include <avr/io.h>
 #define F_CPU TM1638_AVR_CLK
@@ -39,6 +38,8 @@
 #include "main.h"
 #elif defined(TM1638_PLATFORM_STM32_LL)
 #include "main.h"
+#elif defined(TM1638_PLATFORM_8051_NUVOTON)
+#include "MS51_16K.h"
 #elif defined(TM1638_PLATFORM_ESP32_IDF)
 #include "freertos/FreeRTOS.h"
 #include "driver/gpio.h"
@@ -54,7 +55,7 @@
  */
 
 #if defined(TM1638_PLATFORM_STM32)
-void TM1638_SetGPIO_OUT(GPIO_TypeDef *GPIOx, uint32_t GPIO_Pin)
+void TM1638_SetGPIO_OUT(GPIO_TypeDef *GPIOx, unsigned long GPIO_Pin)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
   GPIO_InitStruct.Pin = GPIO_Pin;
@@ -64,7 +65,7 @@ void TM1638_SetGPIO_OUT(GPIO_TypeDef *GPIOx, uint32_t GPIO_Pin)
   HAL_GPIO_Init(GPIOx, &GPIO_InitStruct);
 }
 									
-void TM1638_SetGPIO_IN_PU(GPIO_TypeDef *GPIOx, uint32_t GPIO_Pin)
+void TM1638_SetGPIO_IN_PU(GPIO_TypeDef *GPIOx, unsigned long GPIO_Pin)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
   GPIO_InitStruct.Pin = GPIO_Pin;
@@ -74,7 +75,7 @@ void TM1638_SetGPIO_IN_PU(GPIO_TypeDef *GPIOx, uint32_t GPIO_Pin)
   HAL_GPIO_Init(GPIOx, &GPIO_InitStruct);
 }
 #elif defined(TM1638_PLATFORM_STM32_LL)
-void TM1638_SetGPIO_OUT(GPIO_TypeDef *GPIOx, uint32_t GPIO_Pin)
+void TM1638_SetGPIO_OUT(GPIO_TypeDef *GPIOx, unsigned long GPIO_Pin)
 {
   LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
 
@@ -86,7 +87,7 @@ void TM1638_SetGPIO_OUT(GPIO_TypeDef *GPIOx, uint32_t GPIO_Pin)
   LL_GPIO_Init(GPIOx, &GPIO_InitStruct);
 }
 									
-void TM1638_SetGPIO_IN_PU(GPIO_TypeDef *GPIOx, uint32_t GPIO_Pin)
+void TM1638_SetGPIO_IN_PU(GPIO_TypeDef *GPIOx, unsigned long GPIO_Pin)
 {
   LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
 
@@ -109,6 +110,15 @@ void TM1638_SetGPIO_IN_PU(gpio_num_t GPIO_Pad)
   gpio_set_direction(GPIO_Pad, GPIO_MODE_INPUT);
   gpio_set_pull_mode(GPIO_Pad, GPIO_PULLUP_ONLY);
 }
+#elif defined(TM1638_PLATFORM_8051_NUVOTON)
+void TM1638_SetGPIO_OUT(unsigned char GPIO_Pad){
+  P0M1 &= ~(1<<GPIO_Pad);
+  P0M2 |= (1<<GPIO_Pad);
+}
+void TM1638_SetGPIO_IN_PU(unsigned char GPIO_Pad){
+  P0M1 |= (1<<GPIO_Pad);
+  P0M2 &= ~(1<<GPIO_Pad);
+}
 #endif
 
 static void
@@ -125,6 +135,11 @@ TM1638_PlatformInit(void)
 #elif defined(TM1638_PLATFORM_ESP32_IDF)
   TM1638_SetGPIO_OUT(TM1638_CLK_GPIO);
   TM1638_SetGPIO_OUT(TM1638_STB_GPIO);
+#elif defined(TM1638_PLATFORM_8051_NUVOTON)
+  TM1638_SetGPIO_OUT(TM1638_CLK_GPIO5);
+  TM1638_SetGPIO_OUT(TM1638_DIO_GPIO6);
+  TM1638_SetGPIO_OUT(TM1638_STB_GPIO7);
+
 #endif
 }
 
@@ -156,6 +171,8 @@ TM1638_DioConfigOut(void)
   TM1638_SetGPIO_OUT(TM1638_DIO_GPIO, TM1638_DIO_PIN);
 #elif defined(TM1638_PLATFORM_ESP32_IDF)
   TM1638_SetGPIO_OUT(TM1638_DIO_GPIO);
+#elif defined(TM1638_PLATFORM_8051_NUVOTON)
+  TM1638_SetGPIO_OUT(TM1638_DIO_GPIO6);
 #endif
 }
 
@@ -168,11 +185,13 @@ TM1638_DioConfigIn(void)
   TM1638_SetGPIO_IN_PU(TM1638_DIO_GPIO, TM1638_DIO_PIN);
 #elif defined(TM1638_PLATFORM_ESP32_IDF)
   TM1638_SetGPIO_IN_PU(TM1638_DIO_GPIO);
+#elif defined(TM1638_PLATFORM_8051_NUVOTON)
+  TM1638_SetGPIO_IN_PU(TM1638_DIO_GPIO6);
 #endif
 }
 
 static void
-TM1638_DioWrite(uint8_t Level)
+TM1638_DioWrite(unsigned char Level)
 {
 #if defined(TM1638_PLATFORM_AVR)
   if (Level)
@@ -192,13 +211,21 @@ TM1638_DioWrite(uint8_t Level)
   }
 #elif defined(TM1638_PLATFORM_ESP32_IDF)
   gpio_set_level(TM1638_DIO_GPIO, Level);
+#elif defined(TM1638_PLATFORM_8051_NUVOTON)
+	if(Level){
+    TM1638_DIO_GPIO_HIGH;
+  }
+  else{
+    TM1638_DIO_GPIO_LOW;
+  }
 #endif
 }
 
-static uint8_t
+static unsigned char
 TM1638_DioRead(void)
 {
-  uint8_t Result = 1;
+  unsigned char
+ Result = 1;
 #if defined(TM1638_PLATFORM_AVR)
   Result = (TM1638_DIO_PIN & (1 << TM1638_DIO_NUM)) ? 1 : 0;
 #elif defined(TM1638_PLATFORM_STM32)
@@ -207,12 +234,14 @@ TM1638_DioRead(void)
   Result = (LL_GPIO_ReadInputPort(TM1638_DIO_GPIO) & TM1638_DIO_PIN) == TM1638_DIO_PIN;
 #elif defined(TM1638_PLATFORM_ESP32_IDF)
   Result = gpio_get_level(TM1638_DIO_GPIO);
+#elif defined(TM1638_PLATFORM_8051_NUVOTON)
+  Result=TM1638_DIO_GPIO;
 #endif
   return Result;
 }
 
 static void
-TM1638_ClkWrite(uint8_t Level)
+TM1638_ClkWrite(unsigned char Level)
 {
 #if defined(TM1638_PLATFORM_AVR)
   if (Level)
@@ -232,11 +261,18 @@ TM1638_ClkWrite(uint8_t Level)
   }
 #elif defined(TM1638_PLATFORM_ESP32_IDF)
   gpio_set_level(TM1638_CLK_GPIO, Level);
+#elif defined(TM1638_PLATFORM_8051_NUVOTON)
+  if(Level){
+    TM1638_CLK_GPIO_HIGH;
+  }
+  else{
+    TM1638_CLK_GPIO_LOW;
+  }
 #endif
 }
 
 static void
-TM1638_StbWrite(uint8_t Level)
+TM1638_StbWrite(unsigned char Level)
 {
 #if defined(TM1638_PLATFORM_AVR)
   if (Level)
@@ -256,20 +292,29 @@ TM1638_StbWrite(uint8_t Level)
   }
 #elif defined(TM1638_PLATFORM_ESP32_IDF)
   gpio_set_level(TM1638_STB_GPIO, Level);
+#elif defined(TM1638_PLATFORM_8051_NUVOTON)
+  if(Level){
+    TM1638_STB_GPIO_HIGH;
+  }
+  else{
+  TM1638_STB_GPIO_LOW; 
+  }
 #endif
 }
 
 static void
-TM1638_DelayUs(uint8_t Delay)
+TM1638_DelayUs(unsigned char Delay)
 {
 #if defined(TM1638_PLATFORM_AVR)
   for (; Delay; --Delay)
     _delay_us(1);
 #elif defined(TM1638_PLATFORM_STM32) || defined(TM1638_PLATFORM_STM32_LL)
-  for (uint32_t DelayCounter = 0; DelayCounter < 100 * Delay; DelayCounter++)
+  for (unsigned long DelayCounter = 0; DelayCounter < 100 * Delay; DelayCounter++)
     DelayCounter = DelayCounter;
 #elif defined(TM1638_PLATFORM_ESP32_IDF)
   ets_delay_us(Delay);
+#elif defined(TM1638_PLATFORM_8051_NUVOTON)
+  _delay_();
 #endif
 }
 

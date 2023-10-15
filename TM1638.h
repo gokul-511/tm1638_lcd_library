@@ -41,7 +41,7 @@ extern "C" {
 
 
 /* Includes ---------------------------------------------------------------------*/
-#include <stdint.h>
+//#include <stdint.h>
 
 
 /* Functionality Options --------------------------------------------------------*/
@@ -87,23 +87,23 @@ typedef struct TM1638_Handler_s
   // Config the GPIO that connected to DIO PIN of SHT1x as input
   void (*DioConfigIn)(void);
   // Set level of the GPIO that connected to DIO PIN of SHT1x
-  void (*DioWrite)(uint8_t);
+  void (*DioWrite)(unsigned char);
   // Read the GPIO that connected to DIO PIN of SHT1x
-  uint8_t (*DioRead)(void);
+  unsigned char (*DioRead)(void);
 
   // Set level of the GPIO that connected to CLK PIN of SHT1x
-  void (*ClkWrite)(uint8_t);
+  void (*ClkWrite)(unsigned char);
 
   // Set level of the GPIO that connected to STB PIN of SHT1x
-  void (*StbWrite)(uint8_t);
+  void (*StbWrite)(unsigned char);
 
   // Delay (us)
-  void (*DelayUs)(uint8_t);
+  void (*DelayUs)(unsigned char);
 
-  uint8_t DisplayType;
+  unsigned char DisplayType;
 
 #if (TM1638_SUPPORT_COM_ANODE)
-  uint8_t DisplayRegister[16];
+  unsigned char DisplayRegister[16];
 #endif
 } TM1638_Handler_t;
 
@@ -138,7 +138,7 @@ typedef enum TM1638_Result_e
  *         - TM1638_OK: Operation was successful.
  */
 TM1638_Result_t
-TM1638_Init(TM1638_Handler_t *Handler, uint8_t Type);
+TM1638_Init(TM1638_Handler_t *Handler, unsigned char Type);
 
 
 /**
@@ -180,7 +180,7 @@ TM1638_DeInit(TM1638_Handler_t *Handler);
  */
 TM1638_Result_t
 TM1638_ConfigDisplay(TM1638_Handler_t *Handler,
-                     uint8_t Brightness, uint8_t DisplayState);
+                     unsigned char Brightness, unsigned char DisplayState);
 
 
 /**
@@ -199,7 +199,7 @@ TM1638_ConfigDisplay(TM1638_Handler_t *Handler,
  */
 TM1638_Result_t
 TM1638_SetSingleDigit(TM1638_Handler_t *Handler,
-                      uint8_t DigitData, uint8_t DigitPos);
+                      unsigned char DigitData, unsigned char DigitPos);
 
 
 /**
@@ -218,8 +218,8 @@ TM1638_SetSingleDigit(TM1638_Handler_t *Handler,
  *         - TM1638_OK: Operation was successful
  */
 TM1638_Result_t
-TM1638_SetMultipleDigit(TM1638_Handler_t *Handler, const uint8_t *DigitData,
-                        uint8_t StartAddr, uint8_t Count);
+TM1638_SetMultipleDigit(TM1638_Handler_t *Handler, const unsigned char *DigitData,
+                        unsigned char StartAddr, unsigned char Count);
 
 
 /**
@@ -238,7 +238,7 @@ TM1638_SetMultipleDigit(TM1638_Handler_t *Handler, const uint8_t *DigitData,
  */
 TM1638_Result_t
 TM1638_SetSingleDigit_HEX(TM1638_Handler_t *Handler,
-                          uint8_t DigitData, uint8_t DigitPos);
+                          unsigned char DigitData, unsigned char DigitPos);
 
 
 /**
@@ -259,8 +259,8 @@ TM1638_SetSingleDigit_HEX(TM1638_Handler_t *Handler,
  *         - TM1638_OK: Operation was successful
  */
 TM1638_Result_t
-TM1638_SetMultipleDigit_HEX(TM1638_Handler_t *Handler, const uint8_t *DigitData,
-                            uint8_t StartAddr, uint8_t Count);
+TM1638_SetMultipleDigit_HEX(TM1638_Handler_t *Handler, const unsigned char *DigitData,
+                            unsigned char StartAddr, unsigned char Count);
 
 
 /**
@@ -283,8 +283,8 @@ TM1638_SetMultipleDigit_HEX(TM1638_Handler_t *Handler, const uint8_t *DigitData,
  *         - TM1638_OK: Operation was successful
  */
 TM1638_Result_t
-TM1638_SetMultipleDigit_CHAR(TM1638_Handler_t *Handler, const uint8_t *DigitData,
-                             uint8_t StartAddr, uint8_t Count);
+TM1638_SetMultipleDigit_CHAR(TM1638_Handler_t *Handler, const unsigned char *DigitData,
+                             unsigned char StartAddr, unsigned char Count);
 
 
 
@@ -313,7 +313,7 @@ TM1638_SetMultipleDigit_CHAR(TM1638_Handler_t *Handler, const uint8_t *DigitData
  *         - TM1638_OK: Operation was successful
  */
 TM1638_Result_t
-TM1638_ScanKeys(TM1638_Handler_t *Handler, uint32_t *Keys);
+TM1638_ScanKeys(TM1638_Handler_t *Handler, unsigned long *Keys);
 
 
 
