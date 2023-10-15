@@ -106,9 +106,9 @@ extern "C" {
 #define TM1638_CLK_GPIO5 5
 #define TM1638_DIO_GPIO6 6
 #define TM1638_STB_GPIO7 7
-#define TM1638_DIO_GPIO_HIGH    P1|=(1<<6);
-#define TM1638_DIO_GPIO_LOW     P1&=~(1<<6);
-#define TM1638_STB_GPIO_HIGH    P1|=(1<<7);
+#define TM1638_DIO_GPIO_HIGH    P1|=(1<<6); 
+#define TM1638_DIO_GPIO_LOW     P1&=~(1<<6); 
+#define TM1638_STB_GPIO_HIGH    P1|=(1<<7); 
 #define TM1638_STB_GPIO_LOW    P1&=~(1<<7);
 #define TM1638_CLK_GPIO_HIGH    P1|=(1<<5);
 #define TM1638_CLK_GPIO_LOW    P1&=~(1<<5);

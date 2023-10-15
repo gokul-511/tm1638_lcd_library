@@ -112,10 +112,12 @@ void TM1638_SetGPIO_IN_PU(gpio_num_t GPIO_Pad)
 }
 #elif defined(TM1638_PLATFORM_8051_NUVOTON)
 void TM1638_SetGPIO_OUT(unsigned char GPIO_Pad){
+  clr_SFRS_SFRPAGE;
   P0M1 &= ~(1<<GPIO_Pad);
   P0M2 |= (1<<GPIO_Pad);
 }
 void TM1638_SetGPIO_IN_PU(unsigned char GPIO_Pad){
+  clr_SFRS_SFRPAGE;
   P0M1 |= (1<<GPIO_Pad);
   P0M2 &= ~(1<<GPIO_Pad);
 }
