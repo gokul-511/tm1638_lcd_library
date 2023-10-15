@@ -1,4 +1,4 @@
-# TM1638 Library
+# TM1638 Library(LCD files also)
 Library for handling TM1638 LED display driver.
 
 ## Library Features
